@@ -12,8 +12,8 @@ function app_up () {
 }
 
 function deploy() {
-  $COMPOSE exec app ./bin/build
-  $COMPOSE exec app ./bin/post-deploy
+  $COMPOSE exec -T app ./bin/build
+  $COMPOSE exec -T app ./bin/post-deploy
 }
 
 case $1 in
