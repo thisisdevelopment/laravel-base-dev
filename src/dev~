@@ -2,7 +2,6 @@
 
 cd $(dirname "$0")/../../
 COMPOSE="docker-compose -f docker/docker-compose.yml --project-directory ."
-COMPOSE_EXEC="${COMPOSE} exec --user www-data"
 
 function app_up () {
     if [ -z $($COMPOSE ps -q app) ] || [ -z $(docker ps -q --no-trunc | grep $($COMPOSE ps -q app)) ]; then
@@ -13,8 +12,8 @@ function app_up () {
 }
 
 function deploy() {
-  $COMPOSE_EXEC -T app ./bin/build
-  $COMPOSE_EXEC -T app ./bin/post-deploy
+  $COMPOSE exec -T app ./bin/build
+  $COMPOSE exec -T app ./bin/post-deploy
 }
 
 case $1 in
@@ -48,12 +47,12 @@ rm)
     $COMPOSE rm --stop --force
     ;;
 
-logs|l)
+logs)
     app_up
     $COMPOSE logs -f
     ;;
 
-shell|bash)
+php-cli|b)
     app_up
     if [[ -z "${*:2}" ]]; then
         ARGS="bash"
@@ -61,7 +60,7 @@ shell|bash)
         ARGS=${*:2}
     fi
 
-    $COMPOSE_EXEC app $ARGS
+    $COMPOSE exec app $ARGS
     ;;
 
 composer|c)
@@ -71,7 +70,7 @@ composer|c)
     else
        ARGS=${*:2}
     fi
-    $COMPOSE_EXEC app composer $ARGS
+    $COMPOSE exec app composer $ARGS
     ;;
 
 artisan|a)
@@ -81,49 +80,41 @@ artisan|a)
         ARGS=${*:2}
     fi
 
-    $COMPOSE_EXEC app ./artisan $ARGS
+    $COMPOSE exec app ./artisan $ARGS
     ;;
 
-phpcs|cs)
+phpcs)
     app_up
     ARGS=""
     if [[ -n "${*:2}" ]]; then
         ARGS=${*:2}
     fi
 
-    $COMPOSE_EXEC app ./vendor/bin/phpcs $ARGS
+    $COMPOSE exec app ./vendor/bin/phpcs $ARGS
     ;;
 
-phpcbf|cbf)
+phpcbf)
     app_up
     ARGS=""
     if [[ -n "${*:2}" ]]; then
         ARGS=${*:2}
     fi
 
-    $COMPOSE_EXEC app ./vendor/bin/phpcbf $ARGS
+    $COMPOSE exec app ./vendor/bin/phpcbf $ARGS
     ;;
-tinker|ti)
-    app_up
-    ARGS=""
-    if [[ -n "${*:2}" ]]; then
-        ARGS=${*:2}
-    fi
-    
-    $COMPOSE_EXEC app ./artisan tinker $ARGS
-    ;;
-phpunit|test)
+
+phpunit|t)
     app_up
     ARGS=""
     if [[ -n "${*:2}" ]]; then
         ARGS=${*:2}
     fi
 
-    $COMPOSE_EXEC app ./vendor/bin/phpunit $ARGS
+    $COMPOSE exec app ./vendor/bin/phpunit $ARGS
     ;;
 
 *)
     echo "Shortcuts to control development environment"
-    echo "Usage: $0 [up|init|down|rm|logs|shell|artisan|phpcs|phpcbf|phpunit|composer|tinker]"
+    echo "Usage: $0 [up|init|down|rm|logs|php-cli|artisan|phpcs|phpcbf|phpunit|composer]"
     ;;
 esac
