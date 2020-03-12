@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 cd $(dirname "$0")/../../
-COMPOSE="docker-compose -f docker/docker-compose.yml --project-directory ."
+COMPOSE="docker-compose"
 COMPOSE_EXEC="${COMPOSE} exec --user www-data"
 
 function app_up () {
@@ -27,7 +27,6 @@ init)
         echo "This project is already initialized!"
         exit 1
     fi
-    find ./storage -type d -print0 | xargs -0 chmod 777
     git init
     cp ./bin/git-hooks/* ./.git/hooks/
     chmod +x ./.git/hooks/*
@@ -43,7 +42,6 @@ down)
     app_up
     $COMPOSE down
     ;;
-
 rm)
     $COMPOSE rm --stop --force
     ;;
@@ -121,9 +119,17 @@ phpunit|test)
 
     $COMPOSE_EXEC app ./vendor/bin/phpunit $ARGS
     ;;
+php)
+    app_up
+    ARGS=""
+    if [[ -n "${*:2}" ]]; then
+        ARGS=${*:2}
+    fi
 
+    $COMPOSE_EXEC app php $ARGS
+    ;;
 *)
     echo "Shortcuts to control development environment"
-    echo "Usage: $0 [up|init|down|rm|logs|shell|artisan|phpcs|phpcbf|phpunit|composer|tinker]"
+    echo "Usage: $0 [up|init|down|rm|logs|shell|php|artisan|phpcs|phpcbf|phpunit|composer|tinker]"
     ;;
 esac
