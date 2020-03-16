@@ -2,7 +2,7 @@
 
 cd $(dirname "$0")/../../
 COMPOSE="docker-compose"
-COMPOSE_EXEC="${COMPOSE} exec --user www-data"
+COMPOSE_EXEC="${COMPOSE} exec"
 
 function app_up () {
     if [ -z $($COMPOSE ps -q app) ] || [ -z $(docker ps -q --no-trunc | grep $($COMPOSE ps -q app)) ]; then
@@ -10,11 +10,6 @@ function app_up () {
         echo "./bin/dev up"
         exit 1
     fi
-}
-
-function deploy() {
-  $COMPOSE_EXEC -T app ./bin/build
-  $COMPOSE_EXEC -T app ./bin/post-deploy
 }
 
 case $1 in
@@ -32,16 +27,21 @@ init)
     chmod +x ./.git/hooks/*
     $COMPOSE up --build -d
     sleep 10s
-    deploy
+    $COMPOSE_EXEC -T app ./bin/build
+    $COMPOSE_EXEC -T app ./bin/post-deploy
+    $COMPOSE_EXEC -T app php artisan key:generate
     ;;
+    
 deploy)
     app_up
     deploy
     ;;
+    
 down)
     app_up
     $COMPOSE down
     ;;
+    
 rm)
     $COMPOSE rm --stop --force
     ;;
@@ -101,6 +101,7 @@ phpcbf|cbf)
 
     $COMPOSE_EXEC app ./vendor/bin/phpcbf $ARGS
     ;;
+    
 tinker|ti)
     app_up
     ARGS=""
@@ -110,6 +111,7 @@ tinker|ti)
     
     $COMPOSE_EXEC app ./artisan tinker $ARGS
     ;;
+    
 phpunit|test)
     app_up
     ARGS=""
@@ -119,6 +121,7 @@ phpunit|test)
 
     $COMPOSE_EXEC app ./vendor/bin/phpunit $ARGS
     ;;
+    
 php)
     app_up
     ARGS=""
@@ -128,6 +131,7 @@ php)
 
     $COMPOSE_EXEC app php $ARGS
     ;;
+    
 *)
     echo "Shortcuts to control development environment"
     echo "Usage: $0 [up|init|down|rm|logs|shell|php|artisan|phpcs|phpcbf|phpunit|composer|tinker]"
