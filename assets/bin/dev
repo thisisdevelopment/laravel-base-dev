@@ -1,0 +1,253 @@
+#!/bin/bash
+
+set -eu
+
+cd $(dirname "$0")/../../
+COMPOSE="docker-compose"
+
+function app_require_env() {
+      if [ ! -f .env ]; then
+          echo -e "\033[0;31m.env file missing!\033[0m, Please run:"
+          echo "$0 init"
+          exit 1
+      fi
+}
+
+function app_require_up() {
+    if [ -z $($COMPOSE ps -q app) ] || [ -z $(docker ps -q --no-trunc | grep $($COMPOSE ps -q app)) ]; then
+        echo -e "\033[0;31mApp container not up!\033[0m, Please run:"
+        echo "$0 up"
+        exit 1
+    fi
+}
+
+function app_up() {
+    app_require_env
+    $COMPOSE up --build -d
+    app_run ./vendor/bin/wait-redis
+    app_run ./vendor/bin/wait-db
+}
+
+function app_down() {
+    app_require_env
+    $COMPOSE down
+}
+
+function app_exec() {
+    app_require_env
+    app_require_up
+    if [ -n "${COMPOSER_BINARY:-}" ]; then
+        exec $COMPOSE exec -T app $@
+    else
+        exec $COMPOSE exec app $@
+    fi
+}
+
+function app_run() {
+    app_require_env
+    app_require_up
+    if [ -n "${COMPOSER_BINARY:-}" ]; then
+        $COMPOSE exec -T app $@
+    else
+        $COMPOSE exec app $@
+    fi
+}
+
+function app_logs() {
+    app_require_up
+    $COMPOSE logs $@
+}
+
+function usage() {
+    echo "Shortcuts to control development environment"
+    echo "Usage: $0 [up|init|down|logs|exec|composer|npm|php|artisan|tinker|phpcs|phpcbf|phpunit]"
+}
+
+function init_git() {
+    if [ ! -d .git ]; then
+        git init
+    fi
+
+    for hook in pre-commit; do
+        if [ ! -e "./.git/hooks/${hook}" ]; then
+            hookScript="vendor/thisisdevelopment/laravel-base-dev/assets/git-hooks/${hook}"
+            chmod a+x "${hookScript}"
+            ln -s "../../${hookScript}" "./.git/hooks/${hook}"
+        fi
+    done
+}
+
+function init_env() {
+    APP_DOMAIN=""
+    APP_NAME=""
+    APP_KEY=""
+    COMPOSE_PROJECT_NAME=""
+
+    if [ ! -f ".env" ]; then
+        cp .env.example .env
+    fi
+
+    . .env
+
+    service=$(basename $(pwd))
+    project=$(basename $(dirname $(pwd)))
+    APP_DOMAIN="${service}.${project}.docker"
+    USER_ID=$(id -u)
+    GROUP_ID=$(id -g)
+
+    if [ -z "${COMPOSE_PROJECT_NAME}" ]; then
+        COMPOSE_PROJECT_NAME="${project}_${service}"
+    fi
+
+    if [ -z "${APP_KEY}" ]; then
+        APP_KEY="base64:$(openssl rand -base64 32)"
+    fi
+
+    if [ -z "${APP_NAME}" ]; then
+        APP_NAME="${project} -- ${service}"
+    fi
+
+    cat > .env.new <<EOF
+COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+USER_ID=${USER_ID}
+GROUP_ID=${GROUP_ID}
+
+APP_NAME="${APP_NAME}"
+APP_DOMAIN=${APP_DOMAIN}
+APP_URL="http://\${APP_DOMAIN}"
+APP_KEY="${APP_KEY}"
+EOF
+
+   egrep -v "^(USER_ID|GROUP_ID|APP_DOMAIN|APP_NAME|APP_KEY|APP_URL|COMPOSER_PROJECT_NAME)=" .env >> .env.new
+   mv .env.new .env
+}
+
+function init_idea() {
+    if [ -d ".idea" ]; then
+        return
+    fi
+
+    mkdir -p ".idea"
+    uuid_db=$(uuidgen)
+    uuid_php=$(uuidgen)
+    service=$(basename $(pwd))
+    project=$(basename $(dirname $(pwd)))
+    domain=$APP_DOMAIN
+
+    export domain service project uuid_php uuid_db
+    for i in ./vendor/thisisdevelopment/laravel-base-dev/assets/.idea/*; do
+        envsubst "\$project \$service \$domain \$uuid_db \$uuid_php" < "$i" > ./.idea/$(basename "$i")
+    done
+}
+
+function check_dns() {
+    if ! grep -qFx "#-----------Docker-Hoster-Domains----------" /etc/hosts; then
+        echo "/**********************************************************************"
+        echo " *                   ------ WARNING -----------"
+        echo " **********************************************************************/"
+        echo "It seems you have no docker-hoster running, this means you have no easy way of connecting to your containers"
+        echo "You can start it with the following command: "
+        echo ""
+        echo "docker run --restart=unless-stopped -d \\"
+        echo "  -v /var/run/docker.sock:/tmp/docker.sock \\"
+        echo "  -v /etc/hosts:/tmp/hosts \\"
+        echo "  thisisdevelopment/docker-hoster"
+        echo ""
+    fi
+}
+
+function init() {
+    init_env
+    init_git
+    init_idea
+    app_up
+    app_run ./bin/build
+    app_run ./bin/post-deploy
+    check_dns
+
+    echo "/**********************************************************************"
+    echo " * Your laravel application is now configured an and available."
+    echo " * The urls to reach the services on your local machine are:"
+    echo " * - your application: http://${APP_DOMAIN}"
+    echo " * - mail catcher: http://mail.${APP_DOMAIN}"
+    echo " * - database server: mysql://db.${APP_DOMAIN}:3306"
+    echo " * - redis server: redis.${APP_DOMAIN}"
+    echo " **********************************************************************/"
+    echo ""
+}
+
+if [ $# -eq 0 ]; then
+    usage
+    exit 1
+else
+    cmd=$1
+    shift
+fi
+
+case $cmd in
+
+init)
+    init
+    ;;
+
+up)
+    app_up
+    ;;
+
+down)
+    app_down
+    ;;
+
+logs|l)
+    app_logs $@
+    ;;
+
+exec)
+    if [ $# -eq 0 ]; then
+        app_exec bash
+    else
+        app_exec $@
+    fi
+    ;;
+
+bash|cli)
+    app_exec bash $@
+    ;;
+
+php|php-cli)
+    app_exec php -a $@
+    ;;
+
+composer)
+    app_exec composer $@
+    ;;
+
+npm)
+    app_exec npm $@
+    ;;
+
+artisan|a)
+    app_exec ./artisan $@
+    ;;
+
+tinker|ti)
+    app_exec ./artisan tinker $@
+    ;;
+
+phpcs|cs)
+    app_exec ./vendor/bin/phpcs $@
+    ;;
+
+phpcbf|cbf)
+    app_exec ./vendor/bin/phpcbf $@
+    ;;
+
+phpunit|test)
+    app_exec ./vendor/bin/phpunit $@
+    ;;
+
+*)
+    usage
+    ;;
+
+esac

@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+error_reporting(E_ERROR | E_PARSE);
+
+require "./vendor/autoload.php";
+$env = Dotenv\Dotenv::createMutable("./");
+$env->load();
+
+$tries = 10;
+$dsn = "{$_ENV['DB_CONNECTION']}:host={$_ENV['DB_HOST']};port={$_ENV['DB_PORT']};dbname={$_ENV['DB_DATABASE']}";
+
+for ($i=0; $i<$tries; $i++) {
+    try {
+        $dbh = new PDO($dsn, $_ENV['DB_USERNAME'], $_ENV['DB_PASSWORD']);
+        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        exit(0);
+    } catch (Throwable $e) {
+        echo "[WARNING] Unable to connect to database: {$e->getMessage()}, retrying in 2 seconds\n";
+        sleep(2);
+    }
+}
+
+echo "[ERROR] Unable to connect to database ({$dsn})\n";
+exit(1);

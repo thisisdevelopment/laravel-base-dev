@@ -1,0 +1,20 @@
+#!/bin/bash
+
+PHPCS_BIN=./vendor/bin/phpcs
+
+# simple check if code sniffer is set up correctly
+if [ ! -x $PHPCS_BIN ]; then
+    echo "PHP CodeSniffer bin not found or executable -> $PHPCS_BIN"
+    exit 1
+fi
+
+OUTPUT=$(docker-compose run --no-deps app $PHPCS_BIN --filter=GitStaged)
+RETVAL=$?
+
+if [ $RETVAL -ne 0 ]; then
+    echo "$OUTPUT"
+    echo ""
+    echo -e "\033[41mCOMMIT FAILED => check PHPCS output above\033[0m\n"
+fi
+
+exit $RETVAL

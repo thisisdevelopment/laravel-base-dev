@@ -1,0 +1,25 @@
+#!/usr/bin/env php
+<?php
+
+error_reporting(E_ERROR | E_PARSE);
+
+require "./vendor/autoload.php";
+$env = Dotenv\Dotenv::createMutable("./");
+$env->load();
+
+$tries = 10;
+$dsn = "redis:host={$_ENV['REDIS_HOST']};port={$_ENV['REDIS_PORT']}";
+
+for ($i=0; $i<$tries; $i++) {
+    try {
+        (new Redis)->connect($_ENV['REDIS_HOST'], $_ENV['REDIS_PORT'], 2);
+
+        exit(0);
+    } catch (Throwable $e) {
+        echo "[WARNING] Unable to connect to redis: {$e->getMessage()}, retrying in 2 seconds\n";
+        sleep(2);
+    }
+}
+
+echo "[ERROR] Unable to connect to redis ({$dsn})\n";
+exit(1);
