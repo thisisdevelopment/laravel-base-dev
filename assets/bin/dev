@@ -23,6 +23,7 @@ function app_require_up() {
 
 function app_up() {
     app_require_env
+    $COMPOSE pull
     $COMPOSE up --build -d
     app_run ./vendor/bin/wait-redis
     app_run ./vendor/bin/wait-db
