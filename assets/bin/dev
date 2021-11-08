@@ -59,9 +59,44 @@ function app_logs() {
     $COMPOSE logs $@
 }
 
+function package_dev_init() {
+    package=$1
+    package_name=$(basename "$package")
+    info=$($COMPOSE run --no-deps --rm app bash -c "composer show -l -f json \"$package\" 2>/dev/null")
+    
+    #TODO: check if package exists
+    giturl=$(jq -r '.source | select(.type == "git") | .url'<<<"$info")
+    latest=$(jq -r '.latest'<<<"$info")
+    next=$(echo "$latest" | awk -F. -v OFS=. '{$NF+=1;print}')
+
+    git clone $giturl ./packages/${package_name}
+    
+    composer=$(jq ".version = \"$next\"" ./packages/${package_name}/composer.json)
+    echo -n "$composer" > "./packages/${package_name}/composer.json"
+    
+    $COMPOSE run --no-deps --rm app composer update "$package"
+}
+
+function package_dev_done() {
+    package=$1
+    package_name=$(basename "$package")
+    
+    if [ ! -d "packages/${package_name}" ]; then
+        echo "Package $package not found in packages dir"
+        exit 1;
+    fi
+    
+    #TODO: check if changes committed
+    
+    rm -rf "vendor/${package}" "packages/${package_name}"
+    
+    #TODO: increment minimal version in composer.json
+    $COMPOSE run --no-deps --rm app composer update "$package"
+}
+
 function usage() {
     echo "Shortcuts to control development environment"
-    echo "Usage: $0 [up|init|down|logs|exec|composer|npm|php|artisan|tinker|phpcs|phpcbf|phpunit]"
+    echo "Usage: $0 [up|init|down|logs|exec|composer|npm|php|artisan|tinker|phpcs|phpcbf|phpunit|package-dev-init|package-dev-done]"
 }
 
 function init_git() {
@@ -246,7 +281,12 @@ phpcbf|cbf)
 phpunit|test)
     app_exec ./vendor/bin/phpunit $@
     ;;
-
+package-dev-init)
+    package_dev_init $@
+    ;;
+package-dev-done)
+    package_dev_done $@
+    ;;
 *)
     usage
     ;;
