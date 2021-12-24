@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ eventClass }};
+use {{ exceptionClass }};
+use {{ modelClass }};
+use {{ repositoryInterface }};
+
+class {{ class }}
+{
+    private {{ repositoryInterface }} $repository;
+
+    public function __construct({{ repositoryInterface }} $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function execute({{ modelClass }} ${{ modelClassVar }}, {{ dtoClass }} $dto): {{ modelClass }}
+    {
+        ${{ modelClassVar } = $this->repository->update(${{ modelClassVar }}, $dto);
+
+        event(new {{ eventClass }}(${{ modelClassVar }));
+
+        return ${{ modelClassVar };
+    }
+}

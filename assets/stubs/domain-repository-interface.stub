@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ exceptionClass }};
+use {{ modelClass }};
+use {{ dtoClass }};
+
+interface {{ class }}
+{
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function create({{ dtoClass }} $dto): Redirect;
+
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function update({{ modelClass }} ${{ modelClassVar }}, {{ dtoClass }} $dto): {{ modelClass }};
+
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function delete({{ modelClass }} ${{ modelClassVar }}): void;
+}

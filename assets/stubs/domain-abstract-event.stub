@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ fullModelClass }};
+use Illuminate\Queue\SerializesModels;
+
+abstract class Abstract{{ modelClass }}Event
+{
+    use SerializesModels;
+
+    public {{ modelClass }} ${{ modelClassVariable }};
+
+    public function __construct({{ modelClass }} ${{ modelClassVariable }})
+    {
+        $this->{{ modelClassVariable }} = ${{ modelClassVariable }};
+    }
+}
