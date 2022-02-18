@@ -8,7 +8,20 @@ class MakeDomainException extends AbstractDomainGeneratorCommand
 
     protected $description = 'Create a new domain-exception class';
 
-    protected $type = 'Exception';
+    protected function getClassFqn(): string
+    {
+        return $this->fqnHelper()->exceptionFqn();
+    }
 
-    protected $hasMultiplePerModel = false;
+    protected function getVariables(): array
+    {
+        $h = $this->fqnHelper();
+
+        $exceptionFqn = $h->exceptionFqn();
+
+        return [
+            'namespace' => $h->getModelNamespace('exception', false),
+            'className' => $h->baseClass($exceptionFqn),
+        ];
+    }
 }

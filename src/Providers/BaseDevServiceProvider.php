@@ -3,7 +3,10 @@
 namespace ThisIsDevelopment\LaravelBaseDev\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use ThisIsDevelopment\LaravelBaseDev\Commands\MakeDomain;
+use ThisIsDevelopment\LaravelBaseDev\Commands\MakeDomainAbstractEvent;
 use ThisIsDevelopment\LaravelBaseDev\Commands\MakeDomainAction;
+use ThisIsDevelopment\LaravelBaseDev\Commands\MakeDomainDto;
 use ThisIsDevelopment\LaravelBaseDev\Commands\MakeDomainEvent;
 use ThisIsDevelopment\LaravelBaseDev\Commands\MakeDomainException;
 use ThisIsDevelopment\LaravelBaseDev\Commands\MakeDomainModel;
@@ -16,11 +19,14 @@ class BaseDevServiceProvider extends ServiceProvider
         // Register the command if we are using the application via the CLI
         if ($this->app->runningInConsole()) {
             $this->commands([
+                MakeDomain::class,
+                MakeDomainAbstractEvent::class,
                 MakeDomainAction::class,
+                MakeDomainDto::class,
                 MakeDomainEvent::class,
                 MakeDomainException::class,
                 MakeDomainModel::class,
-                MakeDomainRepositoryInterface::class
+                MakeDomainRepositoryInterface::class,
             ]);
         }
     }

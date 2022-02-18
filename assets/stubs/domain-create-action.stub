@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace {{ namespace }};
 
-use {{ eventClass }};
-use {{ exceptionClass }};
-use {{ modelClass }};
-use {{ repositoryInterface }};
+use {{ dtoFqn }};
+use {{ preEventFqn }};
+use {{ postEventFqn }};
+use {{ exceptionFqn }};
+use {{ modelFqn }};
+use {{ repositoryInterfaceFqn }};
 
-class {{ class }}
+class {{ className }}
 {
-    private {{ repositoryInterface }} $repository;
-
-    public function __construct({{ repositoryInterface }} $repository)
+    public function __construct(private {{ repositoryInterface }} $repository)
     {
-        $this->repository = $repository;
     }
 
     /**
@@ -23,10 +22,12 @@ class {{ class }}
      */
     public function execute({{ dtoClass }} $dto): {{ modelClass }}
     {
-        ${{ modelClassVar } = $this->repository->create($dto);
+        event(new {{ preEventClass }}($dto));
 
-        event(new {{ eventClass }}(${{ modelClassVar }));
+        $model = $this->repository->create($dto);
 
-        return ${{ modelClassVar };
+        event(new {{ postEventClass }}($model, $dto));
+
+        return $model;
     }
 }

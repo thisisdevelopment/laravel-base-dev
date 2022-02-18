@@ -4,27 +4,29 @@ declare(strict_types=1);
 
 namespace {{ namespace }};
 
-use {{ eventClass }};
-use {{ exceptionClass }};
-use {{ modelClass }};
-use {{ repositoryInterface }};
+use {{ preEventFqn }};
+use {{ postEventFqn }};
+use {{ exceptionFqn }};
+use {{ modelFqn }};
+use {{ repositoryInterfaceFqn }};
 
-class {{ class }}
+class {{ className }}
 {
-    private {{ repositoryInterface }} $repository;
-
-    public function __construct({{ repositoryInterface }} $repository)
+    public function __construct(private {{ repositoryInterface }} $repository)
     {
-        $this->repository = $repository;
     }
 
     /**
      * @throws {{ exceptionClass }}
      */
-    public function execute({{ modelClass }} ${{ modelClassVar }})
+    public function execute({{ modelClass }} $model)
     {
-        $this->repository->delete(${{ modelClassVar }});
+        event(new {{ preEventClass }}($model));
 
-        event(new {{ eventClass }}(${{ modelClassVar }));
+        $modelId = $model->id;
+
+        $this->repository->delete($model);
+
+        event(new {{ postEventClass }}($modelId));
     }
 }
