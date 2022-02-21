@@ -4,25 +4,22 @@ declare(strict_types=1);
 
 namespace {{ namespace }};
 
-use {{ preEventFqn }};
-use {{ postEventFqn }};
+use {{ dtoFqn }};
 use {{ exceptionFqn }};
 use {{ modelFqn }};
-use {{ repositoryInterfaceFqn }};
-use {{ dtoFqn }};
+use {{ postEventFqn }};
+use {{ preEventFqn }};
 
-class {{ className }}
+class {{ className }} extends {{ parentClass }}
 {
-    public function __construct(private {{ repositoryInterface }} $repository)
-    {
-    }
-
     /**
      * @throws {{ exceptionClass }}
      */
-    public function execute({{ modelClass }} $model, {{ dtoClass }} $dto): {{ modelClass }}
+    public function execute({{ modelClass }} $model, {{ dtoClass }} $dto): {{ modelClass }}|bool
     {
-        event(new {{ preEventClass }}($model, $dto));
+        if (!event(new {{ preEventClass }}($model, $dto))) {
+            return false;
+        }
 
         $model = $this->repository->{{ repositoryAction }}($model, $dto);
 
@@ -30,4 +27,4 @@ class {{ className }}
 
         return $model;
     }
-}y
+}

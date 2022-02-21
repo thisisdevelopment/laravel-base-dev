@@ -5,24 +5,21 @@ declare(strict_types=1);
 namespace {{ namespace }};
 
 use {{ dtoFqn }};
-use {{ preEventFqn }};
-use {{ postEventFqn }};
 use {{ exceptionFqn }};
 use {{ modelFqn }};
-use {{ repositoryInterfaceFqn }};
+use {{ postEventFqn }};
+use {{ preEventFqn }};
 
-class {{ className }}
+class {{ className }} extends {{ parentClass }}
 {
-    public function __construct(private {{ repositoryInterface }} $repository)
-    {
-    }
-
     /**
      * @throws {{ exceptionClass }}
      */
-    public function execute({{ dtoClass }} $dto): {{ modelClass }}
+    public function execute({{ dtoClass }} $dto): {{ modelClass }}|bool
     {
-        event(new {{ preEventClass }}($dto));
+        if (!event(new {{ preEventClass }}($dto))) {
+            return false;
+        }
 
         $model = $this->repository->create($dto);
 

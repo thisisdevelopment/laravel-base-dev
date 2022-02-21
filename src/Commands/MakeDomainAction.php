@@ -48,7 +48,11 @@ class MakeDomainAction extends AbstractDomainGeneratorCommand
 
         $exceptionFqn = $h->exceptionFqn();
         $modelFqn = $h->modelFqn();
-        $repositoryInterfaceFqn = $h->repositoryInterfaceFqn();
+        $parentFqn = $h->fqn(
+            'action',
+            "abstract_{$this->argument('model')}_action",
+            hasMultiplePerModel: true
+        );
 
         $context = [
             'namespace' => $h->getModelNamespace('action', true),
@@ -63,8 +67,8 @@ class MakeDomainAction extends AbstractDomainGeneratorCommand
             'exceptionClass' => $h->baseClass($exceptionFqn),
             'modelFqn' => $modelFqn,
             'modelClass' => $h->baseClass($modelFqn),
-            'repositoryInterfaceFqn' => $repositoryInterfaceFqn,
-            'repositoryInterface' => $h->baseClass($repositoryInterfaceFqn),
+            'parentClass' => $h->baseClass($parentFqn),
+
             'repositoryAction' => Str::camel($this->argument('type')),
         ];
 

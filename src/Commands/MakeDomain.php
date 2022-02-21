@@ -38,6 +38,9 @@ class MakeDomain extends Command
         }
 
         // actions
+        if ($this->wantsOneOf(['all', 'actions', 'abstract-action'])) {
+            $this->createAbstractAction();
+        }
         if ($this->wantsOneOf(['all', 'actions', 'create-action'])) {
             $this->createAction('create');
         }
@@ -90,6 +93,7 @@ class MakeDomain extends Command
             ['exception', null, InputOption::VALUE_NONE, 'Generate exception'],
 
             ['actions', null, InputOption::VALUE_NONE, 'Generate all actions'],
+            ['abstract-action', null, InputOption::VALUE_NONE, 'Generate abstract-action'],
             ['create-action', null, InputOption::VALUE_NONE, 'Generate create-action'],
             ['update-action', null, InputOption::VALUE_NONE, 'Generate update-action'],
             ['delete-action', null, InputOption::VALUE_NONE, 'Generate delete-action'],
@@ -152,6 +156,16 @@ class MakeDomain extends Command
             'model' => $this->argument('model'),
             '--force' => $this->option('force'),
         ]);
+    }
+
+    private function createAbstractAction(): int
+    {
+        return
+            $this->call(MakeDomainAbstractAction::class, [
+                'domain' => $this->argument('domain'),
+                'model' => $this->argument('model'),
+                '--force' => $this->option('force'),
+            ]);
     }
 
     private function createAction(string $type): int
