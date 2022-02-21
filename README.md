@@ -45,8 +45,11 @@ This is the main entry point for generating everything. It takes a number of (op
       --delete-action   generate delete-action
       --events          generate model
       --abstract-event  generate abstract-event
+      --creating-event  generate creating-event
       --created-event   generate created-event
+      --updating-event  generate updating-event
       --updated-event   generate updated-event
+      --deleting-event  generate deleting-event
       --deleted-event   generate deleted-event
       --dtos            generate all dtos
       --create-dto      generate create-dto
@@ -70,3 +73,32 @@ $ ./artisan make:domain-dto Foo Bar update-email
 ```
 
 This will generate `Bar\UpdateEmailBarAction`, `Bar\BarUpdateEmailEvent`, and `Bar\UpdateEmailBarDto` classes. 
+
+Running the entire suite will result in the following generated files:
+```
+app/Domain/{domain}/
+  Actions/
+    {model}/
+      Create{model}Action
+      Delete{model}Action
+      Update{model}Action
+  Dtos/
+    {model}/
+      Create{model}Dto
+      Update{model}Dto
+  Events/
+    {model}/
+      Abstract{model}Event
+      {model}CreatingEvent
+      {model}CreatedEvent
+      {model}UpdatingEvent
+      {model}UpdatedEvent
+      {model}DeletingEvent
+      {model}DeletedEvent
+  Exceptions/
+    {model}Exception
+  Models/
+    {model}
+  Repositories/
+    {model}RepositoryInterface
+```
