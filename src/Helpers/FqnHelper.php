@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ThisIsDevelopment\LaravelBaseDev\Generators;
+namespace ThisIsDevelopment\LaravelBaseDev\Helpers;
 
 use Illuminate\Support\Str;
 

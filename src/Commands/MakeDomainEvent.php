@@ -43,7 +43,7 @@ class MakeDomainEvent extends AbstractDomainGeneratorCommand
 
         $modelFqn = $h->modelFqn();
 
-        if(0 === preg_match('/(?:ed|ing)$/i', $this->argument('type'))) {
+        if (0 === preg_match('/(?:ed|ing)$/i', $this->argument('type'))) {
             $this->warn(<<<TXT
                 Uncommon event provided (`{$this->argument('type')}` does not end with `ing` or `ed`)
                 which could lead to invalid Dto references. Please verify generated code!
@@ -51,7 +51,9 @@ class MakeDomainEvent extends AbstractDomainGeneratorCommand
         }
 
         $dtoFqn = $h->dtoFqn(preg_replace(
-            '/(?:ed|ing)$/i', 'e', $this->argument('type')
+            '/(?:ed|ing)$/i',
+            'e',
+            $this->argument('type')
         ));
 
         return [

@@ -17,8 +17,8 @@ class MakeDomainAction extends AbstractDomainGeneratorCommand
             'create' => 'stubs/domain-create-action.stub',
             'delete' => 'stubs/domain-delete-action.stub',
 
-                // catch all. This template is problably the most suitable
-                // for _any_ action that will be performed on the model
+            // catch all. This template is problably the most suitable
+            // for _any_ action that will be performed on the model
             default => 'stubs/domain-update-action.stub',
         };
     }
@@ -68,6 +68,7 @@ class MakeDomainAction extends AbstractDomainGeneratorCommand
             'repositoryAction' => Str::camel($this->argument('type')),
         ];
 
+        // When deleting, dto's do not apply
         if ('delete' !== $this->argument('type')) {
             $dtoFqn = $h->dtoFqn($this->argument('type'));
             $context += [

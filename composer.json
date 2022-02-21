@@ -7,6 +7,10 @@
         {
             "name": "Eric de Ruiter",
             "email": "eric@thisisdevelopment.nl"
+        },
+        {
+            "name": "Jeroen Faijdherbe",
+            "email": "jeroen@thisisdevelopment.nl"
         }
     ],
     "require": {
@@ -39,6 +43,5 @@
         "psr-4": {
             "ThisIsDevelopment\\LaravelBaseDev\\": "src/"
         }
-    },
-    "version": "0.5.5"
+    }
 }

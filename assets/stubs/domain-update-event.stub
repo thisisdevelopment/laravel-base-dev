@@ -12,5 +12,6 @@ class {{ className }} extends {{ extends }}
     public function __construct(
         public {{ modelClass }} ${{ modelVar }},
         public {{ dtoClass }} ${{ dtoVar }},
-    ) { }
+    ) {
+    }
 }

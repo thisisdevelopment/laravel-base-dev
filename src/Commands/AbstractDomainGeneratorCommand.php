@@ -6,7 +6,7 @@ use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use ThisIsDevelopment\LaravelBaseDev\Generators\FqnHelper;
+use ThisIsDevelopment\LaravelBaseDev\Helpers\FqnHelper;
 
 abstract class AbstractDomainGeneratorCommand extends GeneratorCommand
 {
