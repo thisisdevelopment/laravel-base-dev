@@ -10,14 +10,7 @@ use ThisIsDevelopment\LaravelBaseDev\Helpers\FqnHelper;
 
 abstract class AbstractDomainGeneratorCommand extends GeneratorCommand
 {
-    public const ROOT_NAMESPACE_DEFAULT = 'ThisIsDevelopment\Domain';
-
-    /**
-     * Root namespace of the class to be generated.
-     *
-     * @var string
-     **/
-    protected string $rootNamespace = self::ROOT_NAMESPACE_DEFAULT;
+    public const ROOT_NAMESPACE_DEFAULT = 'Domain';
 
     /**
      * Optional stub path override
@@ -46,7 +39,10 @@ abstract class AbstractDomainGeneratorCommand extends GeneratorCommand
 
     public function rootNamespace(): string
     {
-        return $this->rootNamespace;
+        return trim(
+            str_replace('/', '\\', $this->option('namespace')),
+            '\\'
+        );
     }
 
     /** Stub related **/
@@ -109,7 +105,8 @@ abstract class AbstractDomainGeneratorCommand extends GeneratorCommand
     protected function getOptions(): array
     {
         return [
-            ['force', null, InputOption::VALUE_NONE, 'force generation when class already exists']
+            ['force', null, InputOption::VALUE_NONE, 'force generation when class already exists'],
+            ['namespace', null, InputOption::VALUE_OPTIONAL, 'The domain workspace.', self::ROOT_NAMESPACE_DEFAULT],
         ];
     }
 

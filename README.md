@@ -36,6 +36,7 @@ All commands allow you to pass the `--force` option. using this option you can o
 This is the main entry point for generating everything. It takes a number of (optional) arguments:
 ```
   -a, --all             Generate all related files
+      --namespace       The root namespace the domain should be part of. Default: Domain
       --model           generate model
       --repository      generate repository interface
       --exception       generate exception
@@ -102,3 +103,6 @@ app/Domain/{domain}/
   Repositories/
     {model}RepositoryInterface
 ```
+
+## Namespace option
+providing the `--namespace` option allows you to change the default `Domain` root namespace to something else. e.g. `--namespace "ThisIsDevelopment\\LaravelDomain"` will generate the following Product model in the Order domain: `ThisIsDevelopment\LaravelDomain\Order\Models\Product`. 

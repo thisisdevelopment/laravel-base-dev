@@ -87,6 +87,7 @@ class MakeDomain extends Command
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'force generation when class already exists'],
             ['all', 'a', InputOption::VALUE_NONE, 'Generate all related files'],
+            ['namespace', null, InputOption::VALUE_OPTIONAL, AbstractDomainGeneratorCommand::ROOT_NAMESPACE_DEFAULT],
 
             ['model', null, InputOption::VALUE_NONE, 'Generate model'],
             ['repository', null, InputOption::VALUE_NONE, 'Generate repository interface'],
@@ -127,6 +128,7 @@ class MakeDomain extends Command
             'domain' => $this->argument('domain'),
             'model' => $this->argument('model'),
             '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
         ]);
     }
 
@@ -136,6 +138,7 @@ class MakeDomain extends Command
             'domain' => $this->argument('domain'),
             'model' => $this->argument('model'),
             '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
         ]);
     }
 
@@ -146,6 +149,7 @@ class MakeDomain extends Command
             'model' => $this->argument('model'),
             'type' => $type,
             '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
         ]);
     }
 
@@ -155,28 +159,29 @@ class MakeDomain extends Command
             'domain' => $this->argument('domain'),
             'model' => $this->argument('model'),
             '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
         ]);
     }
 
     private function createAbstractAction(): int
     {
-        return
-            $this->call(MakeDomainAbstractAction::class, [
-                'domain' => $this->argument('domain'),
-                'model' => $this->argument('model'),
-                '--force' => $this->option('force'),
-            ]);
+        return $this->call(MakeDomainAbstractAction::class, [
+            'domain' => $this->argument('domain'),
+            'model' => $this->argument('model'),
+            '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
+        ]);
     }
 
     private function createAction(string $type): int
     {
-        return
-            $this->call(MakeDomainAction::class, [
-                'domain' => $this->argument('domain'),
-                'model' => $this->argument('model'),
-                'type' => $type,
-                '--force' => $this->option('force'),
-            ]);
+        return $this->call(MakeDomainAction::class, [
+            'domain' => $this->argument('domain'),
+            'model' => $this->argument('model'),
+            'type' => $type,
+            '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
+        ]);
     }
 
     private function createAbstractEvent(): int
@@ -185,6 +190,7 @@ class MakeDomain extends Command
             'domain' => $this->argument('domain'),
             'model' => $this->argument('model'),
             '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
         ]);
     }
 
@@ -195,6 +201,7 @@ class MakeDomain extends Command
             'model' => $this->argument('model'),
             'type' => $event,
             '--force' => $this->option('force'),
+            '--namespace' => $this->option('namespace'),
         ]);
     }
 }
