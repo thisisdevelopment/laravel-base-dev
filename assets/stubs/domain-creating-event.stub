@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ dtoFqn }};
+
+class {{ className }} extends {{ extends }}
+{
+    public function __construct(
+        public {{ dtoClass }} ${{ dtoVar }},
+    ) {
+    }
+}

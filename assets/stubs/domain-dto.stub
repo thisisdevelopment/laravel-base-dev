@@ -1,0 +1,10 @@
+<?php
+
+namespace {{ namespace }};
+
+use Spatie\DataTransferObject\DataTransferObject;
+
+class {{ className }} extends DataTransferObject
+{
+    /* @todo  Add properties */
+}

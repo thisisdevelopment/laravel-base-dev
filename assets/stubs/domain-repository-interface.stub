@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ exceptionFqn }};
+use {{ modelFqn }};
+use {{ createDtoFqn }};
+use {{ updateDtoFqn }};
+
+interface {{ className }}
+{
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function create({{ createDtoClass }} $dto): {{ modelClass }};
+
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function update({{ modelClass }} $model, {{ updateDtoClass }} $dto): {{ modelClass }};
+
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function delete({{ modelClass }} $model): void;
+}

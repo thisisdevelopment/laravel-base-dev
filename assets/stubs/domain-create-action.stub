@@ -1,0 +1,30 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ dtoFqn }};
+use {{ exceptionFqn }};
+use {{ modelFqn }};
+use {{ postEventFqn }};
+use {{ preEventFqn }};
+
+class {{ className }} extends {{ parentClass }}
+{
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function execute({{ dtoClass }} $dto): {{ modelClass }}|bool
+    {
+        if (!event(new {{ preEventClass }}($dto))) {
+            return false;
+        }
+
+        $model = $this->repository->create($dto);
+
+        event(new {{ postEventClass }}($model, $dto));
+
+        return $model;
+    }
+}

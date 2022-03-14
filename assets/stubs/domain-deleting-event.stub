@@ -1,0 +1,15 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ modelFqn }};
+
+class {{ className }} extends {{ extends }}
+{
+    public function __construct(
+        public {{ modelClass }} ${{ modelVar }},
+    ) {
+    }
+}

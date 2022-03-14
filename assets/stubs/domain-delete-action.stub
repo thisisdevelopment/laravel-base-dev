@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace {{ namespace }};
+
+use {{ exceptionFqn }};
+use {{ modelFqn }};
+use {{ postEventFqn }};
+use {{ preEventFqn }};
+
+class {{ className }} extends {{ parentClass }}
+{
+    /**
+     * @throws {{ exceptionClass }}
+     */
+    public function execute({{ modelClass }} $model): bool
+    {
+        if (!event(new {{ preEventClass }}($model))) {
+            return false;
+        }
+
+        $modelId = $model->id;
+
+        $this->repository->delete($model);
+
+        event(new {{ postEventClass }}($modelId));
+
+        return true;
+    }
+}
