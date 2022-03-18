@@ -40,7 +40,7 @@ abstract class AbstractDomainGeneratorCommand extends GeneratorCommand
     public function rootNamespace(): string
     {
         return trim(
-            str_replace('/', '\\', $this->option('namespace')),
+            str_replace('/', '\\', $this->option('namespace') ?: self::ROOT_NAMESPACE_DEFAULT),
             '\\'
         );
     }
@@ -106,7 +106,7 @@ abstract class AbstractDomainGeneratorCommand extends GeneratorCommand
     {
         return [
             ['force', null, InputOption::VALUE_NONE, 'force generation when class already exists'],
-            ['namespace', null, InputOption::VALUE_OPTIONAL, 'The domain workspace.', self::ROOT_NAMESPACE_DEFAULT],
+            ['namespace', null, InputOption::VALUE_OPTIONAL, 'The domain namespace', self::ROOT_NAMESPACE_DEFAULT],
         ];
     }
 

@@ -87,7 +87,7 @@ class MakeDomain extends Command
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'force generation when class already exists'],
             ['all', 'a', InputOption::VALUE_NONE, 'Generate all related files'],
-            ['namespace', null, InputOption::VALUE_OPTIONAL, AbstractDomainGeneratorCommand::ROOT_NAMESPACE_DEFAULT],
+            ['namespace', null, InputOption::VALUE_OPTIONAL, 'The domain namespace', AbstractDomainGeneratorCommand::ROOT_NAMESPACE_DEFAULT],
 
             ['model', null, InputOption::VALUE_NONE, 'Generate model'],
             ['repository', null, InputOption::VALUE_NONE, 'Generate repository interface'],
