@@ -16,7 +16,7 @@ class {{ className }} extends {{ parentClass }}
      */
     public function execute({{ modelClass }} $model): bool
     {
-        if (!event(new {{ preEventClass }}($model))) {
+        if (false === event(new {{ preEventClass }}($model))) {
             return false;
         }
 

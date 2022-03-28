@@ -17,7 +17,7 @@ class {{ className }} extends {{ parentClass }}
      */
     public function execute({{ dtoClass }} $dto): {{ modelClass }}|bool
     {
-        if (!event(new {{ preEventClass }}($dto))) {
+        if (false === event(new {{ preEventClass }}($dto))) {
             return false;
         }
 
