@@ -4,6 +4,11 @@ set -eu
 
 cd $(dirname "$0")/../../
 COMPOSE="docker-compose"
+COMPOSE_SERVICE="app"
+
+if [ ! -f "docker-compose.yml" ]; then
+    COMPOSE_SERVICE=$(basename $(pwd))
+fi
 
 function app_require_env() {
       if [ ! -f .env ]; then
@@ -14,7 +19,7 @@ function app_require_env() {
 }
 
 function app_require_up() {
-    if [ -z $($COMPOSE ps -q app) ] || [ -z $(docker ps -q --no-trunc | grep $($COMPOSE ps -q app)) ]; then
+    if [ -z $($COMPOSE ps -q $COMPOSE_SERVICE) ] || [ -z $(docker ps -q --no-trunc | grep $($COMPOSE ps -q $COMPOSE_SERVICE)) ]; then
         echo -e "\033[0;31mApp container not up!\033[0m, Please run:"
         echo "$0 up"
         exit 1
@@ -38,9 +43,9 @@ function app_exec() {
     app_require_env
     app_require_up
     if [ -n "${COMPOSER_BINARY:-}" ]; then
-        exec $COMPOSE exec -T app $@
+        exec $COMPOSE exec -T $COMPOSE_SERVICE $@
     else
-        exec $COMPOSE exec app $@
+        exec $COMPOSE exec $COMPOSE_SERVICE $@
     fi
 }
 
@@ -48,9 +53,9 @@ function app_run() {
     app_require_env
     app_require_up
     if [ -n "${COMPOSER_BINARY:-}" ]; then
-        $COMPOSE exec -T app $@
+        $COMPOSE exec -T $COMPOSE_SERVICE $@
     else
-        $COMPOSE exec app $@
+        $COMPOSE exec $COMPOSE_SERVICE $@
     fi
 }
 
@@ -62,36 +67,36 @@ function app_logs() {
 function package_dev_init() {
     package=$1
     package_name=$(basename "$package")
-    info=$($COMPOSE run --no-deps --rm app bash -c "composer show -l -f json \"$package\" 2>/dev/null")
-    
+    info=$($COMPOSE run --no-deps --rm $COMPOSE_SERVICE bash -c "composer show -l -f json \"$package\" 2>/dev/null")
+
     #TODO: check if package exists
     giturl=$(jq -r '.source | select(.type == "git") | .url'<<<"$info")
     latest=$(jq -r '.latest'<<<"$info")
     next=$(echo "$latest" | awk -F. -v OFS=. '{$NF+=1;print}')
 
     git clone $giturl ./packages/${package_name}
-    
+
     composer=$(jq ".version = \"$next\"" ./packages/${package_name}/composer.json)
     echo -n "$composer" > "./packages/${package_name}/composer.json"
-    
-    $COMPOSE run --no-deps --rm app composer update "$package"
+
+    $COMPOSE run --no-deps --rm $COMPOSE_SERVICE composer update "$package"
 }
 
 function package_dev_done() {
     package=$1
     package_name=$(basename "$package")
-    
+
     if [ ! -d "packages/${package_name}" ]; then
         echo "Package $package not found in packages dir"
         exit 1;
     fi
-    
+
     #TODO: check if changes committed
-    
+
     rm -rf "vendor/${package}" "packages/${package_name}"
-    
+
     #TODO: increment minimal version in composer.json
-    $COMPOSE run --no-deps --rm app composer update "$package"
+    $COMPOSE run --no-deps --rm $COMPOSE_SERVICE composer update "$package"
 }
 
 function usage() {
