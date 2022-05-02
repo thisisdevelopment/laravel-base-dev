@@ -159,7 +159,7 @@ APP_URL="http://\${APP_DOMAIN}"
 APP_KEY="${APP_KEY}"
 EOF
 
-   egrep -v "^(USER_ID|GROUP_ID|APP_DOMAIN|APP_NAME|APP_KEY|APP_URL|COMPOSER_PROJECT_NAME)=" .env >> .env.new
+   egrep -v "^(USER_ID|GROUP_ID|APP_DOMAIN|APP_NAME|APP_KEY|APP_URL|COMPOSE_PROJECT_NAME)=" .env >> .env.new
    mv .env.new .env
 }
 
