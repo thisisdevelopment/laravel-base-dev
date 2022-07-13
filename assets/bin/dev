@@ -95,6 +95,9 @@ function package_dev_done() {
 
     rm -rf "vendor/${package}" "packages/${package_name}"
 
+    # Remove dangling symlinks
+    find ./app -lname "*/${package_name}" -type l -exec rm {} +
+
     #TODO: increment minimal version in composer.json
     $COMPOSE run --no-deps --rm $COMPOSE_SERVICE composer update "$package"
 }
