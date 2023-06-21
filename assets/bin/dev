@@ -2,7 +2,11 @@
 
 set -eu
 
-cd $(dirname "$0")/../../
+if [ -n "${COMPOSER_RUNTIME_BIN_DIR:-}" ]; then
+    cd ${COMPOSER_RUNTIME_BIN_DIR}/../../
+else
+    cd $(dirname "$0")/../../
+fi
 COMPOSE="docker-compose"
 COMPOSE_SERVICE="app"
 
