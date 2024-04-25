@@ -20,9 +20,9 @@
         "barryvdh/laravel-ide-helper": "^2.6",
         "thisisdevelopment/laravel-test-snapshot": "^0.3.0",
         "vlucas/phpdotenv": "^4.0|^5.0",
-        "illuminate/console": "6.x | 7.x | 8.x | 9.x | 10.x",
-        "illuminate/support": "6.x | 7.x | 8.x | 9.x | 10.x",
-        "illuminate/database": "6.x | 7.x | 8.x | 9.x | 10.x"
+        "illuminate/console": "6.x | 7.x | 8.x | 9.x | 10.x | 11.x",
+        "illuminate/support": "6.x | 7.x | 8.x | 9.x | 10.x | 11.x",
+        "illuminate/database": "6.x | 7.x | 8.x | 9.x | 10.x | 11.x"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
