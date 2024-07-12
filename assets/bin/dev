@@ -7,7 +7,7 @@ if [ -n "${COMPOSER_RUNTIME_BIN_DIR:-}" ]; then
 else
     cd $(dirname "$0")/../../
 fi
-COMPOSE="docker-compose"
+COMPOSE="docker compose"
 COMPOSE_SERVICE="app"
 
 if [ ! -f "docker-compose.yml" ]; then
