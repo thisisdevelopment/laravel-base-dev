@@ -25,6 +25,7 @@ class SQLiteConnection extends \Illuminate\Database\SQLiteConnection
 
     protected function getDefaultQueryGrammar()
     {
-        return $this->withTablePrefix(new SQLiteGrammar()); // here comes our custom Grammar object
+        return new SQLiteGrammar($this)
+            ->setTablePrefix($this->tablePrefix); // here comes our custom Grammar object
     }
 }
